@@ -15,15 +15,18 @@ $products = GET_PRODUCTS_BY_USER_ID($conn, $_SESSION['user_id']);
 	<title>My Listings</title>
 	<script src="js/listings.js"></script>
 </head>
+<body>
 <div id='listings'>
 	<p>Click listing to see info</p>
 <?php foreach ($products as $prod) {
 	echo "<p class='listing' onclick='toggleInfo(this)'>{$prod['name']}</p>";
 	echo "<div class='listing_info' style='display: none'>";
-		echo "<p class='desc'>{$prod['description']}</p>";
-		echo "<p class='offers'>0</p>";
+	echo "<p><b>Description:</b></p><p class='desc'>{$prod['description']}</p>";
+	$url = 'offers.php?id=' . urlencode($prod['id']) . '&name=' . urlencode($prod['name']);
+	echo "<p><b>Offers</b></p><p class='offers'>{$prod['offers']} <em><a href=$url>See offers</a></em></p>";
 	echo "</div>";
 }
 ?>
 </div>
+</body>
 </html>
