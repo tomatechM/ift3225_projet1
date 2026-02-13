@@ -1,7 +1,7 @@
 <?php
 $host = '127.0.0.1';
 $dbname = 'joffre';
-$username = 'snig';
+$username = 'root';
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -10,7 +10,7 @@ $options = [
 ];
 
 try {
-	$conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, '', $options);
+	$conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, 'root', $options);
 	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
 	die("Connection failed: " . $e->getMessage());

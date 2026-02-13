@@ -7,13 +7,15 @@ require 'includes/db_connect.php';
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Login or even Logon</title>
-	<link rel="stylesheet" href="assets/css/login.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login</title>
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="login-page">
 	<form action="" method="post">
 
-	<input name="username" placeholder="Username">
+	<input name="username" placeholder="Username" type="text">
 	<input name="password" placeholder="Password" type="password">
 	<button type="submit">Login</button>
 
