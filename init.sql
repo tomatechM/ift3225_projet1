@@ -77,16 +77,28 @@ INSERT INTO Offers (product_id, product_quantity, offer_id, offer_quantity, user
 	(20, 1, 11, 8, 3)
 ;
 
-DELIMITER $$
 
-CREATE TRIGGER inc_Products
-AFTER INSERT ON Offers
+DELIMITER &&
+
+CREATE TRIGGER inc_Products AFTER INSERT ON Offers
 FOR EACH ROW
 BEGIN
-    UPDATE Products
-    SET offers = offers + 1
-    WHERE id = NEW.product_id;
-END$$
+	UPDATE Products p
+	SET p.offers = p.offers + 1
+	WHERE p.id = NEW.product_id;
+END&&
+
+DELIMITER ;
+
+DELIMITER &&
+
+CREATE TRIGGER dec_Products AFTER DELETE ON Offers
+FOR EACH ROW
+BEGIN
+	UPDATE Products p
+	SET p.offers = p.offers - 1
+	WHERE p.id = product_id;
+END&&
 
 DELIMITER ;
 

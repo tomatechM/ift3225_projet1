@@ -1,5 +1,11 @@
-<?php
 
+<?php
+/*
+ * Ce fichier contient du code inspiré de ressources en ligne :
+ * - Notes de cours IFT3225
+ * - Démos du cours IFT3225
+ * - Tutoriels divers sur l'authentification PHP (StackOverflow, ChatGPT, etc.)
+ */
 session_start();
 require 'includes/db_connect.php';
 require 'includes/check_auth.php';
@@ -13,7 +19,7 @@ $offset = ($page - 1) * $per_page;
 $countStmt = $conn->prepare('SELECT COUNT(*) FROM Products WHERE user_id = :uid');
 $countStmt->execute(['uid' => $_SESSION['user_id']]);
 $total_items = (int)$countStmt->fetchColumn();
-$total_pages = max(1, (int)ceil($total_items / $per_page));
+$total_pages = max(1, (int)ceil($total_items / $per_page));	
 
 $stmt = $conn->prepare('SELECT * FROM Products WHERE user_id = :uid ORDER BY id DESC LIMIT :limit OFFSET :offset');
 $stmt->bindValue(':uid', $_SESSION['user_id'], PDO::PARAM_INT);
@@ -32,6 +38,7 @@ $products = $stmt->fetchAll();
 	<title>My Listings</title>
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
 	<div class="container">
 		<div class="back-link">
@@ -41,6 +48,10 @@ $products = $stmt->fetchAll();
 		<div class="header">
 			<h1>Mes annonces</h1>
 			<button class="btn-add" onclick="openAddModal()">+ Ajouter un produit</button>
+		</div>
+
+		<div style="margin-bottom: 20px;">
+			<input type="text" id="searchBar" placeholder="Rechercher un produit..." style="width: 100%; max-width: 400px; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
 		</div>
 
 		<div id="alert" class="alert"></div>
@@ -62,7 +73,6 @@ $products = $stmt->fetchAll();
 							</div>
 						</div>
 						<div class="product-description"><?= htmlspecialchars($prod['description'] ?? 'Pas de description') ?></div>
-						<div class="product-offers">Offres: <?= $prod['offers'] ?></div>
 					</div>
 				<?php endforeach; ?>
 			<?php endif; ?>
@@ -135,5 +145,63 @@ $products = $stmt->fetchAll();
 	</div>
 
 	<script src="js/listings.js"></script>
+	<script>
+	// Recherche asynchrone
+	const searchBar = document.getElementById('searchBar');
+	const listingsDiv = document.getElementById('listings');
+	let lastSearch = '';
+
+	if (searchBar) {
+		searchBar.addEventListener('input', async function() {
+			const query = this.value.trim();
+			lastSearch = query;
+			if (query.length === 0) {
+				// Afficher tous les produits (reload page ou restaurer initial)
+				window.location.reload();
+				return;
+			}
+			try {
+				const resp = await fetch('searchBar.php?q=' + encodeURIComponent(query));
+				if (!resp.ok) return;
+				const products = await resp.json();
+				// Affichage dynamique
+				let html = '';
+				if (products.length === 0) {
+					html = `<div class="empty-state"><p>Aucun produit trouvé.</p></div>`;
+				} else {
+					for (const prod of products) {
+						html += `<div class="product-card" data-product-id="${prod.id}">
+							<div class="product-header">
+								<div class="product-name">${escapeHtml(prod.name)}</div>
+								<div class="product-actions">
+									<button class=\"btn-edit\" onclick=\"openEditModal(${prod.id}, '${jsEscape(prod.name)}', '${jsEscape(prod.description ?? '')}')\">Éditer</button>
+									<button class=\"btn-offers\" onclick=\"location.href='offers.php?id=${prod.id}&name=${encodeURIComponent(prod.name)}'\">Offres</button>
+									<button class=\"btn-delete\" onclick=\"deleteProduct(${prod.id})\">Supprimer</button>
+								</div>
+							</div>
+							<div class="product-description">${escapeHtml(prod.description ?? 'Pas de description')}</div>
+							<div class="product-offers">Offres: ${prod.offers}</div>
+						</div>`;
+					}
+				}
+				listingsDiv.innerHTML = html;
+			} catch (e) {
+				listingsDiv.innerHTML = `<div class='empty-state'><p>Erreur lors de la recherche.</p></div>`;
+			}
+		});
+	}
+
+	// Fonctions utilitaires pour échapper le HTML/JS
+	function escapeHtml(text) {
+		if (!text) return '';
+		return text.replace(/[&<>"']/g, function(m) {
+			return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+		});
+	}
+	function jsEscape(str) {
+		if (!str) return '';
+		return str.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+	}
+	</script>
 </body>
 </html>

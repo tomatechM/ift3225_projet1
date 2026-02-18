@@ -1,5 +1,10 @@
 <?php
-
+/*
+ * Ce fichier contient du code inspiré de ressources en ligne :
+ * - Notes de cours IFT3225
+ * - Démos du cours IFT3225
+ * - Tutoriels divers sur l'authentification PHP (StackOverflow, ChatGPT, etc.)
+ */
 function SQL_GET_OFFERS_BY_PRODUCT_ID($conn, $id) {
 	$req = $conn->prepare("SELECT * FROM Offers WHERE product_id = :id");
 	$req->execute(['id' => $id]);
