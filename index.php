@@ -23,11 +23,18 @@ $is_authenticated = isset($_SESSION['authenticated']) && $_SESSION['authenticate
 		<?php if ($is_authenticated): ?>
 			<!-- Dashboard pour utilisateur authentifié -->
 			<div class="dashboard">
-				<h1>Bienvenue</h1>
+				<?php if ($_SESSION['admin']) {
+				echo '<h1>Bienvenue, Admin</h1>';
+				} else {
+				echo '<h1>Bienvenue</h1>';
+				}
+				?>
 				<p>Utilisateur ID: <?= htmlspecialchars($_SESSION['user_id']) ?></p>
 				
 				<div class="button-group">
 					<a href="listings.php" class="btn-login">Mes annonces</a>
+					<a href="all_listings.php" class="btn-login">Annonces</a>
+					<a href="my_offers.php" class="btn-offers">Mes offres</a>
 					<a href="offers.php" class="btn-offers">Offres</a>
 					<form action="logout.php" method="post" style="flex: 1;">
 						<button type="submit" class="btn-logout">Déconnexion</button>

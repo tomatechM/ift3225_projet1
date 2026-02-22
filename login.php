@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	if (!empty($user_password) && !empty($user_username)) {
 		try {
-			$req = $conn->prepare("SELECT user_id, username, email, hashed_password FROM Users WHERE username = :username or email = :username2");
+			$req = $conn->prepare("SELECT user_id, username, email, hashed_password, admin FROM Users WHERE username = :username or email = :username2");
 			$req->execute(['username' => $user_username, 'username2' => $user_username]);
 			$user = $req->fetch();
 
@@ -26,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		if (password_verify($user_password, $user['hashed_password'])) {
 			$_SESSION['authenticated'] = true;
+			$_SESSION['admin'] = $user['admin'];
 			$_SESSION['user_id'] = $user['user_id'];
 			header("Location: index.php");
 			exit;
