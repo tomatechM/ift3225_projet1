@@ -32,6 +32,30 @@ CREATE TABLE Offers (
 	FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
+DELIMITER &&
+
+CREATE TRIGGER inc_Products AFTER INSERT ON Offers
+FOR EACH ROW
+BEGIN
+	UPDATE Products p
+	SET p.offers = p.offers + 1
+	WHERE p.id = NEW.product_id;
+END&&
+
+DELIMITER ;
+
+DELIMITER &&
+
+CREATE TRIGGER dec_Products AFTER DELETE ON Offers
+FOR EACH ROW
+BEGIN
+	UPDATE Products p
+	SET p.offers = p.offers - 1
+	WHERE p.id = product_id;
+END&&
+
+DELIMITER ;
+
 INSERT INTO Users (username, email, hashed_password) VALUES
 	('user1', 'user1@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
 	('user2', 'user2@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
