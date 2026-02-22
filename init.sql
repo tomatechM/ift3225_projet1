@@ -28,6 +28,7 @@ CREATE TABLE Offers (
 	offer_id INT,
 	offer_quantity INT DEFAULT 1,
 	user_id INT,
+	status ENUM('Accepted', 'Rejected', 'Pending') DEFAULT 'Pending',
 
 	CONSTRAINT fk_offers_product
 	FOREIGN KEY (product_id) REFERENCES Products(id) ON DELETE CASCADE,
@@ -269,9 +270,9 @@ DELIMITER &&
 CREATE TRIGGER inc_Products AFTER INSERT ON Offers
 FOR EACH ROW
 BEGIN
-	UPDATE Products p
-	SET p.offers = p.offers + 1
-	WHERE p.id = NEW.product_id;
+	UPDATE Products
+	SET offers = offers + 1
+	WHERE id = NEW.product_id;
 END&&
 
 DELIMITER ;
@@ -281,9 +282,9 @@ DELIMITER &&
 CREATE TRIGGER dec_Products AFTER DELETE ON Offers
 FOR EACH ROW
 BEGIN
-	UPDATE Products p
-	SET p.offers = p.offers - 1
-	WHERE p.id = product_id;
+	UPDATE Products
+	SET offers = offers - 1
+	WHERE id = OLD.product_id;
 END&&
 
 DELIMITER ;

@@ -28,5 +28,36 @@ function SQL_GET_PRODUCT_BY_OFFER_ID($conn, $offer_id) {
 	$req->execute(['id' => $offer_id]);
 	return $req->fetch();
 }
+function SQL_APPROVE_BY_OFFER_ID($conn, $offer_id) {
 
+	$req = $conn->prepare(
+		"UPDATE Offers SET status = 'Accepted' WHERE id = :id"
+	);
+	$req->execute(['id' => $offer_id]);
+	return $req->fetch();
+}
+function SQL_DELETE_BY_OFFER_ID($conn, $offer_id) {
+
+	$req = $conn->prepare(
+		"DELETE FROM Offers where id = :id"
+	);
+	$req->execute(['id' => $offer_id]);
+	return $req->fetch();
+}
+function SQL_REJECT_BY_OFFER_ID($conn, $offer_id) {
+
+	$req = $conn->prepare(
+		"UPDATE Offers SET status = 'Rejected' WHERE id = :id"
+	);
+	$req->execute(['id' => $offer_id]);
+	return $req->fetch();
+}
+function SQL_SET_PENDING_BY_OFFER_ID($conn, $offer_id) {
+
+	$req = $conn->prepare(
+		"UPDATE Offers SET status = 'Pending' WHERE id = :id"
+	);
+	$req->execute(['id' => $offer_id]);
+	return $req->fetch();
+}
 ?>
