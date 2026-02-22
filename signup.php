@@ -1,4 +1,11 @@
+
 <?php
+/*
+ * Ce fichier contient du code inspiré de ressources en ligne :
+ * - Notes de cours IFT3225
+ * - Démos du cours IFT3225
+ * - Tutoriels divers sur l'authentification PHP (StackOverflow, ChatGPT, etc.)
+ */
 session_start();
 include 'includes/db_connect.php';
 ?>
@@ -6,14 +13,16 @@ include 'includes/db_connect.php';
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Sign up</title>
-	<link rel="stylesheet" href="assets/css/signup.css">
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="login-page">
 	<form action="" method="post">
 
-	<input name="username" placeholder="Username">
-	<input name="email" placeholder="Email">
+	<input name="username" placeholder="Username" type="text">
+	<input name="email" placeholder="Email" type="email">
 	<input name="password" placeholder="Password" type="password">
 	<input name="password2" placeholder="Password again" type="password">
 	<button type="submit">Sign up</button>

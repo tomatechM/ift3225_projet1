@@ -6,14 +6,8 @@
  * - Démos du cours IFT3225
  * - Tutoriels divers sur l'authentification PHP (StackOverflow, ChatGPT, etc.)
  */
-
 session_start();
-
-if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
-	session_unset();
-	session_destroy();
-	header("Location: login.php");
-	exit;
-}
-
+session_destroy();
+header("Location: index.php");
+exit;
 ?>
