@@ -38,14 +38,14 @@ CREATE TABLE Offers (
 );
 
 INSERT INTO Users (username, email, hashed_password) VALUES
-	('user1', 'user1@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user2', 'user2@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user3', 'user3@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user4', 'user4@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user5', 'user5@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu')
+	('user1', 'user1@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user2', 'user2@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user3', 'user3@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user4', 'user4@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user5', 'user5@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi')
 ;
 INSERT INTO Users (username, email, hashed_password, admin) VALUES
-	('admin', 'admin@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu', TRUE)
+	('admin', 'admin@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi', TRUE)
 ;
 
 INSERT INTO Products (user_id, name, description) VALUES

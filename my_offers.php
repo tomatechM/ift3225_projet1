@@ -72,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<link rel="stylesheet" href="assets/css/style.css">
-	<script src="js/offers.js"></script>
 	<style>
 		.offer-item { background: white; padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);} 
 		.offer-header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
@@ -141,7 +140,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			<?php if (empty($offers)): ?>
 				<div class="empty-state">Aucune offre disponible pour l'instant.</div>
 			<?php else: ?>
-				<?php foreach ($offers as $offer): ?>
+				<?php foreach ($offers as $offer):
+                                        $user = SQL_GET_USER_BY_OFFER_ID($conn, $offer['id']);
+                                        $offered_product = SQL_GET_PRODUCT_BY_OFFER_ID($conn, $offer['id']);
+                                ?>
 					<div class="offer-item">
 						<div class="offer-header">
 							<div>
@@ -153,19 +155,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         $rejectValue = ($offer['status'] == "Rejected") ? "pend" : "reject";
                                                         $approveText = ($offer['status'] == "Accepted") ? "Undo Accepter" : "Accepter";
                                                         $rejectText = ($offer['status'] == "Rejected") ? "Undo Rejeter" : "Rejeter";
-                                                        $approveFunc = "";//($offer['status'] == "Accepted") ? "setAcceptPending(this)" : "acceptOffer(this)";
-                                                        $rejectFunc = "";//($offer['status'] == "Rejected") ? "setRejectPending(this)" : "rejectOffer(this)";
                                                         ?>
                                                         <?php if ($offer['user_id'] == $_SESSION['user_id']): ?>
                                                         <form method="POST" class="approveForm">
                                                                 <input type="hidden" name="action" value="<?= $approveValue ?>">
                                                                 <input type="hidden" name="id" value="<?= $offer['id'] ?>">
-                                                                <button type="submit" onclick="<?= $approveFunc ?>" class="btn-submit"><?= $approveText ?></button>
+                                                                <button type="submit" class="btn-submit"><?= $approveText ?></button>
                                                         </form>
                                                         <form method="POST" class="rejectForm">
                                                                 <input type="hidden" name="action" value="<?= $rejectValue ?>">
                                                                 <input type="hidden" name="id" value="<?= $offer['id'] ?>">
-                                                                <button type="submit" onclick="<?= $rejectFunc ?>" class="btn-submit"><?= $rejectText ?></button>
+                                                                <button type="submit" class="btn-submit"><?= $rejectText ?></button>
                                                         </form>
 							<?php endif; ?>
 							<?php if ($_SESSION['admin']): ?>
@@ -173,7 +173,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <input type="hidden" name="action" value="delete">
                                                                 <input type="hidden" name="id" value="<?= $offer['id'] ?>">
                                                                 <button type="submit" class="btn-submit">Delete</button>
-                                                        </form>
+							</form>
+							<?php endif; ?>
                                                         <div style="text-align:right">
                                                                 <div style="color:#667eea;font-weight:bold;">En échange</div>
                                                                 <div style="color:#333;font-weight:bold;"><?= htmlspecialchars($offered_product['name'] ?? 'Produit supprimé') ?></div>
