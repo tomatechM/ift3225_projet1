@@ -16,7 +16,7 @@ $per_page = 15;
 $offset = ($page - 1) * $per_page;
 
 
-$countStmt = $conn->prepare('SELECT COUNT(*) FROM Offers WHERE user_id != :uid');
+$countStmt = $conn->prepare('SELECT COUNT(*) FROM Offers WHERE user_id = :uid');
 $countStmt->execute(['uid' => $_SESSION['user_id']]);
 $total_items = (int)$countStmt->fetchColumn();
 $total_pages = max(1, (int)ceil($total_items / $per_page));
@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
 	$offers = SQL_GET_OFFERS_BY_PRODUCT_ID($conn, $product_id);
 	$mode = 'by_product';
 } else {
-	// Liste globale des offres (exclut les offres créées par l'utilisateur connecté)
+	// Liste globale des offres (inclus seulement les offres créées par l'utilisateur connecté)
 	$current_user = $_SESSION['user_id'] ?? 0;
 	$stmt = $conn->prepare(
 		"SELECT o.*, u.username, p_target.name AS target_name, p_offer.name AS offer_name
@@ -36,10 +36,10 @@ if (isset($_GET['id'])) {
 		 JOIN Users u ON o.user_id = u.user_id
 		 LEFT JOIN Products p_target ON o.product_id = p_target.id
 		 LEFT JOIN Products p_offer ON o.offer_id = p_offer.id
-		 WHERE o.user_id != :uid
+		 WHERE o.user_id = :uid
 		 ORDER BY o.id DESC
-		 LIMIT :limit
-		 OFFSET :offset"
+                 LIMIT :limit
+                 OFFSET :offset"
 	);
 	$stmt->execute(['uid' => $current_user, 'limit' => $per_page, 'offset' => $offset]);
 	$offers = $stmt->fetchAll();
