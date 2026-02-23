@@ -45,6 +45,26 @@ if (isset($_GET['id'])) {
 	$offers = $stmt->fetchAll();
 	$mode = 'global';
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $action = $_POST['action'] ?? '';
+        $offer_id = $_POST['id'] ?? '';
+        if ($action == "approve") {
+                $res = SQL_APPROVE_BY_OFFER_ID($conn, $offer_id);
+                $res['message'] = "Approbation enregistre";
+        } elseif ($action == "reject") {
+                $res = SQL_REJECT_BY_OFFER_ID($conn, $offer_id);
+		$res['message'] = "Rejection enregistre";
+	} elseif ($action == "pend") {
+		$res = SQL_SET_PENDING_BY_OFFER_ID($conn, $offer_id);
+		$res['message'] = "En attente";
+	} elseif ($action == "delete") {
+		$res = SQL_DELETE_BY_OFFER_ID($conn, $offer_id);
+		$res['message'] = "Supprime";
+        } else {
+                $res['message'] = "Erreur";
+	}
+	header('Location: ' . $_SERVER['REQUEST_URI']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -78,10 +98,36 @@ if (isset($_GET['id'])) {
 								<strong><?= htmlspecialchars($user['username'] ?? 'Utilisateur inconnu') ?></strong>
 								<div class="offer-meta">Quantité proposée: <?= (int) $offer['product_quantity'] ?></div>
 							</div>
+							<?php
+							$approveValue = ($offer['status'] == "Accepted") ? "pend" : "approve";
+							$rejectValue = ($offer['status'] == "Rejected") ? "pend" : "reject";
+							$approveText = ($offer['status'] == "Accepted") ? "Undo Accepter" : "Accepter";
+							$rejectText = ($offer['status'] == "Rejected") ? "Undo Rejeter" : "Rejeter";
+							?>
+                                                        <?php if ($offer['user_id'] == $_SESSION['user_id']): ?>
+                                                        <form method="POST" class="approveForm">
+								<input type="hidden" name="action" value="<?= $approveValue ?>">
+                                                                <input type="hidden" name="id" value="<?= $offer['id'] ?>">
+								<button type="submit" class="btn-submit"><?= $approveText ?></button>
+                                                        </form>
+                                                        <form method="POST" class="rejectForm">
+								<input type="hidden" name="action" value="<?= $rejectValue ?>">
+                                                                <input type="hidden" name="id" value="<?= $offer['id'] ?>">
+								<button type="submit" class="btn-submit"><?= $rejectText ?></button>
+                                                        </form>
+							<?php endif; ?>
+							<?php if ($_SESSION['admin']): ?>
+							<form method="POST" class="deleteForm">
+								<input type="hidden" name="action" value="delete">
+								<input type="hidden" name="id" value="<?= $offer['id'] ?>">
+								<button type="submit" class="btn-submit">Delete</button>
+							</form>
+							<?php endif; ?>
 							<div style="text-align:right">
 								<div style="color:#667eea;font-weight:bold;">En échange</div>
 								<div style="color:#333;font-weight:bold;"><?= htmlspecialchars($offered_product['name'] ?? 'Produit supprimé') ?></div>
 								<div class="offer-meta">Quantité: <?= (int) $offer['offer_quantity'] ?></div>
+								<div class="offer-meta">Statut: <?= $offer['status'] ?></div>
 							</div>
 						</div>
 					</div>
@@ -94,18 +140,47 @@ if (isset($_GET['id'])) {
 			<?php if (empty($offers)): ?>
 				<div class="empty-state">Aucune offre disponible pour l'instant.</div>
 			<?php else: ?>
-				<?php foreach ($offers as $offer): ?>
+				<?php foreach ($offers as $offer):
+                                        $user = SQL_GET_USER_BY_OFFER_ID($conn, $offer['id']);
+                                        $offered_product = SQL_GET_PRODUCT_BY_OFFER_ID($conn, $offer['id']);
+                                ?>
 					<div class="offer-item">
 						<div class="offer-header">
 							<div>
 								<strong><?= htmlspecialchars($offer['username'] ?? 'Utilisateur') ?></strong>
 								<div class="offer-meta">Propose: <?= htmlspecialchars($offer['offer_name'] ?? '—') ?> (x<?= (int)$offer['offer_quantity'] ?>)</div>
 							</div>
-							<div style="text-align:right">
-								<div style="color:#667eea;font-weight:bold;">Pour</div>
-								<div style="color:#333;font-weight:bold;"><?= htmlspecialchars($offer['target_name'] ?? '—') ?></div>
-								<div class="offer-meta">Quantité demandée: <?= (int)$offer['product_quantity'] ?></div>
-							</div>
+                                                        <?php
+                                                        $approveValue = ($offer['status'] == "Accepted") ? "pend" : "approve";
+                                                        $rejectValue = ($offer['status'] == "Rejected") ? "pend" : "reject";
+                                                        $approveText = ($offer['status'] == "Accepted") ? "Undo Accepter" : "Accepter";
+                                                        $rejectText = ($offer['status'] == "Rejected") ? "Undo Rejeter" : "Rejeter";
+                                                        ?>
+                                                        <?php if ($offer['user_id'] == $_SESSION['user_id']): ?>
+                                                        <form method="POST" class="approveForm">
+                                                                <input type="hidden" name="action" value="<?= $approveValue ?>">
+                                                                <input type="hidden" name="id" value="<?= $offer['id'] ?>">
+                                                                <button type="submit" class="btn-submit"><?= $approveText ?></button>
+                                                        </form>
+                                                        <form method="POST" class="rejectForm">
+                                                                <input type="hidden" name="action" value="<?= $rejectValue ?>">
+                                                                <input type="hidden" name="id" value="<?= $offer['id'] ?>">
+                                                                <button type="submit" class="btn-submit"><?= $rejectText ?></button>
+                                                        </form>
+							<?php endif; ?>
+							<?php if ($_SESSION['admin']): ?>
+                                                        <form method="POST" class="deleteForm">
+                                                                <input type="hidden" name="action" value="delete">
+                                                                <input type="hidden" name="id" value="<?= $offer['id'] ?>">
+                                                                <button type="submit" class="btn-submit">Delete</button>
+							</form>
+							<?php endif; ?>
+                                                        <div style="text-align:right">
+                                                                <div style="color:#667eea;font-weight:bold;">En échange</div>
+                                                                <div style="color:#333;font-weight:bold;"><?= htmlspecialchars($offered_product['name'] ?? 'Produit supprimé') ?></div>
+                                                                <div class="offer-meta">Quantité: <?= (int) $offer['offer_quantity'] ?></div>
+                                                                <div class="offer-meta">Statut: <?= $offer['status'] ?></div>
+                                                        </div>
 						</div>
 					</div>
 				<?php endforeach; ?>

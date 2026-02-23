@@ -20,6 +20,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	
 	try {
 		switch ($action) {
+			case 'admin_add':
+				$name = $_POST['name'] ?? '';
+				$description = $_POST['description'] ?? '';
+				$user_id = (int)$_POST['user_id'] ?? '';
+
+				if (empty($name)) {
+					$response['message'] = 'Le nom du produit est requis';
+					break;
+				}
+				if (empty($name)) {
+					$response['message'] = "Le ID de l'usager est requis";
+					break;
+				}
+
+				$req = $conn->prepare('INSERT INTO Products (user_id, name, description) VALUES (:user_id, :name, :description)');
+                                $req->execute([
+                                        'user_id' => $user_id,
+                                        'name' => $name,
+                                        'description' => $description
+                                ]);
+
+                                $product_id = $conn->lastInsertId();
+                                $response['success'] = true;
+                                $response['message'] = 'Produit ajouté avec succès';
+                                $response['product_id'] = $product_id;
+                                break;
 			case 'add':
 				$name = $_POST['name'] ?? '';
 				$description = $_POST['description'] ?? '';
@@ -52,13 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					break;
 				}
 				
-				// Vérifier que le produit appartient à l'utilisateur
-				$check = $conn->prepare('SELECT id FROM Products WHERE id = :id AND user_id = :user_id');
-				$check->execute(['id' => $product_id, 'user_id' => $user_id]);
+				// Vérifier que le produit appartient à l'utilisateur ou que l'utilisateur soit admin
+				if (!$_SESSION['admin']) {
+					$check = $conn->prepare('SELECT id FROM Products WHERE id = :id AND user_id = :user_id');
+					$check->execute(['id' => $product_id, 'user_id' => $user_id]);
 				
-				if (!$check->fetch()) {
-					$response['message'] = 'Accès refusé';
-					break;
+					if (!$check->fetch()) {
+						$response['message'] = 'Accès refusé';
+						break;
+					}
 				}
 				
 				$req = $conn->prepare('UPDATE Products SET name = :name, description = :description WHERE id = :id');
@@ -80,17 +108,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					break;
 				}
 				
-				// Vérifier que le produit appartient à l'utilisateur
-				$check = $conn->prepare('SELECT id FROM Products WHERE id = :id AND user_id = :user_id');
-				$check->execute(['id' => $product_id, 'user_id' => $user_id]);
+				// Vérifier que le produit appartient à l'utilisateur ou que l'utilisateur soit admin
+				if (!$_SESSION['admin']) {
+					$check = $conn->prepare('SELECT id FROM Products WHERE id = :id AND user_id = :user_id');
+					$check->execute(['id' => $product_id, 'user_id' => $user_id]);
 				
-				if (!$check->fetch()) {
-					$response['message'] = 'Accès refusé';
-					break;
+					if (!$check->fetch()) {
+						$response['message'] = 'Accès refusé';
+						break;
+					}
 				}
-				
-				// Supprimer les offres liées d'abord
-				$conn->prepare('DELETE FROM Offers WHERE product_id = :product_id OR offer_id = :offer_id')->execute(['product_id' => $product_id, 'offer_id' => $product_id]);
+				// CONTRAINTE dans le db rend cet etape inutile
+				//$conn->prepare('DELETE FROM Offers WHERE product_id = :product_id OR offer_id = :offer_id')->execute(['product_id' => $product_id, 'offer_id' => $product_id]);
 				
 				// Supprimer le produit
 				$req = $conn->prepare('DELETE FROM Products WHERE id = :id');

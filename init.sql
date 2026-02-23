@@ -28,6 +28,7 @@ CREATE TABLE Offers (
 	offer_id INT,
 	offer_quantity INT DEFAULT 1,
 	user_id INT,
+	status ENUM('Accepted', 'Rejected', 'Pending') DEFAULT 'Pending',
 
 	CONSTRAINT fk_offers_product
 	FOREIGN KEY (product_id) REFERENCES Products(id) ON DELETE CASCADE,
@@ -61,14 +62,14 @@ END&&
 DELIMITER ;
 
 INSERT INTO Users (username, email, hashed_password) VALUES
-	('user1', 'user1@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user2', 'user2@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user3', 'user3@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user4', 'user4@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu'),
-	('user5', 'user5@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu')
+	('user1', 'user1@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user2', 'user2@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user3', 'user3@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user4', 'user4@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi'),
+	('user5', 'user5@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi')
 ;
 INSERT INTO Users (username, email, hashed_password, admin) VALUES
-	('admin', 'admin@mail.com', '$2y$10$LHrgwXD8Rei.e32ZUjvDaevbmM6MJhqJkN7.0TW2TmR0by3EGQDxu', TRUE)
+	('admin', 'admin@mail.com', '$2y$10$qRCAfR05XCHmnCSZZFtBvO88aCjjW9dLlLpKCdpcAaOMcPqAjjAbi', TRUE)
 ;
 
 INSERT INTO Products (user_id, name, description) VALUES
@@ -293,9 +294,9 @@ DELIMITER &&
 CREATE TRIGGER inc_Products AFTER INSERT ON Offers
 FOR EACH ROW
 BEGIN
-	UPDATE Products p
-	SET p.offers = p.offers + 1
-	WHERE p.id = NEW.product_id;
+	UPDATE Products
+	SET offers = offers + 1
+	WHERE id = NEW.product_id;
 END&&
 
 DELIMITER ;
@@ -305,9 +306,9 @@ DELIMITER &&
 CREATE TRIGGER dec_Products AFTER DELETE ON Offers
 FOR EACH ROW
 BEGIN
-	UPDATE Products p
-	SET p.offers = p.offers - 1
-	WHERE p.id = product_id;
+	UPDATE Products
+	SET offers = offers - 1
+	WHERE id = OLD.product_id;
 END&&
 
 DELIMITER ;
